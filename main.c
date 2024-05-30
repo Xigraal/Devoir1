@@ -26,12 +26,11 @@ void afficherDuree(double duree) {
     double part_decimale; //variable qui contient la valeur des minutes et secondes en decimale
     int minutes; // variable qui contient les valeurs decimales en minutes
     
-    part_entiere = (int)(duree); // recupperation de la valeur en heure
-    part_decimale = duree - part_entiere; //recupperation de la valeur des minutes et secondes en decimale
-    minutes = (int)(part_decimale * MINUTES_PAR_HEURE); // convertir les valeurs decimales en minutes
+    part_entiere = duree; // recupperation de la valeur en heure
+    part_decimale = duree - part_entiere; //recupperation de la valeur des minutes
+    minutes = (part_decimale * MINUTES_DANS_UNE_HEURE) + FACTEUR_DE_CORRECTION; // convertir les valeurs decimales en minutes
 
     printf(" %dh%d\n", part_entiere, minutes);
-
 }
 
 /**
@@ -42,7 +41,13 @@ void afficherDuree(double duree) {
  * @note Fonction 2
  */
 bool villesEgales(Chaine ville1, Chaine ville2) {
-    //  a completer
+
+    if(chainesEgales(ville1, ville2)){
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 //  Fonctions 3 a 6 : deplacement dans un fichier
@@ -56,7 +61,24 @@ bool villesEgales(Chaine ville1, Chaine ville2) {
  * @note Fonction 3
  */
 int fichierLireEntier(Fichier fichier) {
-    //  a completer
+
+    Chaine chaine;
+    
+    if (finDeFichier(fichier)) {
+
+        fprintf(stderr, "Erreur: la fin de fichier a ete atteinte\n");
+        exit(EXIT_FAILURE);
+    }
+
+    bool valide = fichierLireChaine(fichier, chaine);
+
+    if (valide) {
+        return atoi(chaine);
+    }
+    else {
+        fprintf(stderr, "Erreur de lecture du fichier");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -89,7 +111,19 @@ double fichierLireReel(Fichier fichier) {
  * @note Fonction 5
  */
 bool fichierAvancerChamps(Fichier fichier, int n) {
-    //  a completer
+
+    int i = 0;
+    Chaine chaine;
+
+    while (i < n && fichierLireChaine(fichier, chaine)) {
+        i++;
+    }
+    if (i == n) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 /**
@@ -100,7 +134,15 @@ bool fichierAvancerChamps(Fichier fichier, int n) {
  * @note Fonction 6
  */
 bool fichierAvancerLignes(Fichier fichier, int n) {
-    //  a completer
+
+    for (int i = 0; i < n; i++) {
+
+        if (!fichierLigneSuivante(fichier)) {
+            return false; // Echec de l'avancement des lignes, car la fin de fichier a ete atteinte
+        }
+    }
+
+    return true; // Succes de l'avancement des lignes
 }
 
 //  Fonctions 7 a 10 : manipulation des villes
@@ -113,8 +155,34 @@ bool fichierAvancerLignes(Fichier fichier, int n) {
  * @note Fonction 7
  */
 int chercherNumeroVille(Chaine ville) {
-    //  a completer
-}
+    
+    int numero_de_ligne = 0;
+    Fichier fichier;
+    Chaine ligne;
+
+    fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
+    while (!finDeFichier(fichier)) {
+
+        numero_de_ligne++;
+
+        if (!fichierLireChaine(fichier, ligne)) {
+            fprintf(stderr, "Erreur de lecture du fichier\n");
+            fichierFermer(fichier); // ferme le fichier car le numero n'a pas ete trouve
+            exit(EXIT_FAILURE);
+        }
+        if (strstr(ligne, ville) != NULL) {
+            fichierFermer(fichier); // ferme le fichier car le numero a ete trouve
+            return numero_de_ligne;
+        }
+        if (!fichierLigneSuivante(fichier)) {
+            break; // Arrêter la recherche si la fin du fichier est atteinte
+        }
+    }
+
+    fichierFermer(fichier);
+    return -1; // La ville n'a pas été trouvée
+
+    }
 
 /**
  * @brief Cherche une ville dans la liste des villes a partir de son numero
@@ -248,16 +316,34 @@ void test_afficherDuree() {
     scanf(" %lf", &duree);
 
     afficherDuree(duree);
-
-
 }
 
 void test_villesEgales() {
-    //  a completer
+   
+    Chaine ville1 = "Montreal";
+    Chaine ville2 = "Mirabel";
+    
+    printf("Veuillez entrer les deux villes a comparer: ");
+    scanf(" %s %s", ville1, ville2);
+
+    villesEgales(ville1, ville2);
 }
 
 void test_fichierLireEntier() {
-	//  a completer
+
+    Fichier fichier;
+    int resultat;
+
+    fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
+
+    Chaine c;
+    fichierLireChaine(fichier, c);
+    printf("%s\n", c);
+
+    for (int i = 0; i < 4; i++) {
+        resultat = fichierLireEntier(fichier);
+        printf("%lf\n", resultat);
+    }
 }
 
 
@@ -279,11 +365,30 @@ void test_fichierLireReel() {
 }
 
 void test_fichierAvancerChamps() {
-    //  a completer
+
+    Fichier fichier;
+    double resultat;
+
+    fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
+
+    fichierAvancerChamps(fichier, 7);
+
+    resultat = fichierLireReel(fichier);
+    printf("%lf\n", resultat);
 }
 
 void test_fichierAvancerLignes() {
-    //  a completer
+
+    Fichier fichier;
+
+    fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
+
+    if (fichierAvancerLignes(fichier, 3)) {
+        printf("Echec de l'avancement des lignes, car la fin du fichier a ete atteinte\n");
+    }
+    else {
+        printf("Succes de l'avancement des lignes\n");
+    }
 }
 
 void test_chercherNumeroVille() {
@@ -333,7 +438,7 @@ int main() {
 
     test_afficherDuree();
     printf("------------------------------------------------------------------------------------------------------\n");
-    /*test_villesEgales();
+    test_villesEgales();
     printf("------------------------------------------------------------------------------------------------------\n");
     test_fichierLireEntier();
     printf("------------------------------------------------------------------------------------------------------\n");
@@ -361,8 +466,7 @@ int main() {
     printf("------------------------------------------------------------------------------------------------------\n");
     test_afficherStatistiques();
     printf("------------------------------------------------------------------------------------------------------\n");
-    test_creerStatistiques();*/
+    test_creerStatistiques();
 
     return 0;
 }
-
