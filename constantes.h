@@ -1,6 +1,8 @@
 #pragma once
 
-#define FICHIER_DES_DISTANCES "../distances.csv"
+#define FICHIER_DES_DISTANCES "distances.csv"
+#define FICHIER_ETAPE "etape.txt"
+#define FICHIER_VOYAGE "voyage.txt"
 
 #define DUREE_PAUSE 0.25            //  duree de la pause lors d'un deplacement par voiture
 #define DISTANCE_MAX_ROUTE 600      //  pas plus que 600 Km par route, sinon, par avion
@@ -11,7 +13,8 @@
 #define LIMITE_ATTENTE_AVION 1000   //  avant 1000 Km, 1.5 h d'attente, apres 2.5 h d'attente
 #define ATTENTE_AVION_MIN 1.5       //  attente minimale (1h30')
 #define ATTENTE_AVION_MAX 2.5       //  attente maximale (2h30')
-#define MINUTES_PAR_HEURE 60        
+#define MINUTES_DANS_UNE_HEURE 60   //  utiliser pour convertir des heures reelles en minutes
+#define FACTEUR_DE_CORRECTION 0.5   //  utiliser pour arrondir les heures reelles a la bonne valeur
 
 //  codes d'erreurs
 #define VILLE_NON_TROUVEE (-1)
