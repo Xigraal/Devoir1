@@ -31,8 +31,14 @@ void afficherDuree(double duree) {
     int minutes; // variable qui contient les valeurs decimales en minutes
 
     calcul_duree(duree, &part_entiere, &minutes);
+    if (minutes < 10) {
 
-    printf(" %dh%d'\n", part_entiere, minutes);
+        printf(" %dh0%d'\n", part_entiere, minutes);
+    }
+    else {
+
+        printf(" %dh%d'\n", part_entiere, minutes);
+    }
 }
 /**
  * @brief Calcul  une duree donnees en decimales, en heures et minutes
@@ -626,7 +632,7 @@ void test_afficherDuree() {
     duree = 3.25;
     afficherDuree(duree);
 
-    duree = 1.33;
+    duree = 1.1;
     afficherDuree(duree);
    
     
