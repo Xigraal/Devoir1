@@ -536,7 +536,7 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
             }
 
             
-            if (!preparerEtape(depart, arrivee, &etape)) {
+            if (!preparerEtape(depart, arrivee, etape)) {
                 fprintf(stderr, "Erreur : preparation de l'etape entre %s et %s\n", depart, arrivee);
                 fichierFermer(fichier_voyage);
                 fichierFermer(fichier_etapes);
@@ -545,7 +545,7 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
             }
 
           
-            if (!fichierAjouterEtape(fichier_etapes, &etape)) {
+            if (!fichierAjouterEtape(fichier_etapes, etape)) {
                 fprintf(stderr, "Erreur : ajout de l'etape entre %s et %s\n", depart, arrivee);
                 fichierFermer(fichier_voyage);
                 fichierFermer(fichier_etapes);
@@ -597,25 +597,30 @@ void afficherStatistiques(Statistiques stats) {
 bool creerStatistiques(Chaine nomFichierEtapes, Statistiques stats) {
 
     Fichier fichier_etapes = fichierOuvrirLecture(nomFichierEtapes);
+
     if (fichier_etapes == NULL) {
         fprintf(stderr, "Erreur : impossible d'ouvrir le fichier des etapes %s\n", nomFichierEtapes);
         return false;
     }
 
-    Etape etape = {1,2};
+    Chaine chaine;
 
-    while (fichierLireChaine(fichier_etapes, etape)) {
-        if (etape[ETAPE_LOCOMOTION] == LOCOMOTION_PAR_ROUTE) {
-            stats[STATS_NB_ETAPES_PAR_ROUTE]++;
+    while (fichierLireChaine(fichier_etapes, chaine)) {
+        if (chainesEgales("route", chaine)) {
+            stats[STATS_NB_ETAPES_PAR_ROUTE] +=1;
         }
-        else if (etape[ETAPE_LOCOMOTION] == LOCOMOTION_PAR_AIR) {
-            stats[STATS_NB_ETAPES_PAR_AIR]++;
+        else if (chainesEgales("avion", chaine)) {
+            stats[STATS_NB_ETAPES_PAR_AIR] +=1;
         }
-        if (etape[ETAPE_PAUSES] > 0) {
-            stats[STATS_NB_PAUSES] += etape[ETAPE_PAUSES];
+    }
+    while (fichierLireChaine(fichier_etapes, chaine)) {
+
+        if (atoi(chaine) > 0) {
+
+            stats[STATS_NB_PAUSES] += atoi(chaine);
         }
-        if (etape[ETAPE_ATTENTE] > 0) {
-            stats[STATS_TEMPS_ATTENTE] += etape[ETAPE_ATTENTE];
+        if (atoi(chaine) > 0) {
+            stats[STATS_TEMPS_ATTENTE] += atoi(chaine);
         }
     }
 
@@ -849,8 +854,9 @@ void test_afficherStatistiques() {
 
 void test_creerStatistiques() {
 
-    Statistiques stats = {1, 2, 3, 1.93};
+    Statistiques stats;
     
+
     creerStatistiques(FICHIER_ETAPE, stats);
 
     printf("Les statistiques des etapes du fichier sont:\n");
