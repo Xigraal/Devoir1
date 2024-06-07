@@ -605,10 +605,10 @@ bool creerStatistiques(Chaine nomFichierEtapes, Statistiques stats) {
 
     Chaine chaine;
 
-    stats[STATS_NB_ETAPES_PAR_ROUTE] = 0;
-    stats[STATS_NB_ETAPES_PAR_AIR] = 0;
-    stats[STATS_NB_PAUSES] = 0;
-    stats[STATS_TEMPS_ATTENTE] = 0;
+    stats[STATS_NB_ETAPES_PAR_ROUTE] = 0.0;
+    stats[STATS_NB_ETAPES_PAR_AIR] = 0.0;
+    stats[STATS_NB_PAUSES] = 0.0;
+    stats[STATS_TEMPS_ATTENTE] = 0.0;
 
     while (fichierLireChaine(fichier_etapes, chaine)) {
         if (chainesEgales("route", chaine)) {
