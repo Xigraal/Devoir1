@@ -58,10 +58,6 @@ void calcul_duree(double duree, int* part_entiere, int* minutes) {
     *minutes = (part_decimale * MINUTES_DANS_UNE_HEURE) + FACTEUR_DE_CORRECTION; // convertir les valeurs decimales en minutes
 }
 
-double convertir_en_Heures_decimales(int heures, int minutes) {
-    return heures + (minutes / MINUTES_DANS_UNE_HEURE);
-}
-
 
 
 /**
