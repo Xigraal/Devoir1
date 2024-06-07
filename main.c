@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include < assert.h >
+#include <assert.h>
 #include "utilitaire.h"
 #include "structures.h"
 #include "constantes.h"
@@ -605,22 +605,33 @@ bool creerStatistiques(Chaine nomFichierEtapes, Statistiques stats) {
 
     Chaine chaine;
 
+    stats[STATS_NB_ETAPES_PAR_ROUTE] = 0;
+    stats[STATS_NB_ETAPES_PAR_AIR] = 0;
+    stats[STATS_NB_PAUSES] = 0;
+    stats[STATS_TEMPS_ATTENTE] = 0;
+
     while (fichierLireChaine(fichier_etapes, chaine)) {
         if (chainesEgales("route", chaine)) {
-            stats[STATS_NB_ETAPES_PAR_ROUTE] +=1;
+
+            stats[STATS_NB_ETAPES_PAR_ROUTE] ++;
+
+            if (fichierAvancerLignes(fichier_etapes, 1) && fichierAvancerChamps(fichier_etapes, 4)) {
+                fichierLireChaine(fichier_etapes, chaine);
+
+                stats[STATS_NB_PAUSES] += atof(chaine);
+
+            }
+
         }
         else if (chainesEgales("avion", chaine)) {
-            stats[STATS_NB_ETAPES_PAR_AIR] +=1;
-        }
-    }
-    while (fichierLireChaine(fichier_etapes, chaine)) {
 
-        if (atoi(chaine) > 0) {
+            stats[STATS_NB_ETAPES_PAR_AIR] ++;
 
-            stats[STATS_NB_PAUSES] += atoi(chaine);
-        }
-        if (atoi(chaine) > 0) {
-            stats[STATS_TEMPS_ATTENTE] += atoi(chaine);
+            if (fichierAvancerLignes(fichier_etapes, 1) && fichierAvancerChamps(fichier_etapes, 3)) {
+                fichierLireChaine(fichier_etapes, chaine);
+
+                stats[STATS_TEMPS_ATTENTE] += atof(chaine);
+            }
         }
     }
 
@@ -905,3 +916,4 @@ int main() {
     
     return 0;
 }
+
