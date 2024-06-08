@@ -15,7 +15,6 @@
 
 // derclaration des fonctions
 void calcul_duree(double duree, int* part_entiere, int* minutes);
-double convertir_en_Heures_decimales(int heures, int minutes);
 
 //  Fonctions 1 et 2 : affichage d'une duree et test d'egalite de 2 villes
 //  ----------------------------------------------------------------------
@@ -69,12 +68,7 @@ void calcul_duree(double duree, int* part_entiere, int* minutes) {
  */
 bool villesEgales(Chaine ville1, Chaine ville2) {
 
-    if(chainesEgales(ville1, ville2)){
-        return true;
-    }
-    else {
-        return false;
-    }
+    return chainesEgales(ville1, ville2);
 }
 
 //  Fonctions 3 a 6 : deplacement dans un fichier
@@ -88,22 +82,23 @@ bool villesEgales(Chaine ville1, Chaine ville2) {
  * @note Fonction 3
  */
 int fichierLireEntier(Fichier fichier) {
-
     Chaine chaine;
-    
-    if (finDeFichier(fichier)) {
 
-        fprintf(stderr, "Erreur: la fin de fichier a ete atteinte\n");
+    // Vérifie si la fin de fichier est atteinte
+    if (finDeFichier(fichier)) {
+        fprintf(stderr, "Erreur: la fin de fichier a été atteinte\n");
         exit(EXIT_FAILURE);
     }
 
+    // Lit la prochaine chaîne dans le fichier
     bool valide = fichierLireChaine(fichier, chaine);
 
+    // Si la lecture est valide, convertir la chaîne en entier
     if (valide) {
         return atoi(chaine);
     }
     else {
-        fprintf(stderr, "Erreur de lecture du fichier");
+        fprintf(stderr, "Erreur de lecture du fichier\n");
         exit(EXIT_FAILURE);
     }
 }
@@ -185,20 +180,20 @@ int chercherNumeroVille(Chaine ville) {
     
     int numero_de_ligne = 0;
     Fichier fichier;
-    Chaine ligne;
+    Chaine c;
 
     fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
     while (!finDeFichier(fichier)) {
 
         numero_de_ligne+=1;
 
-        if (!fichierLireChaine(fichier, ligne)) {
+        if (!fichierLireChaine(fichier, c)) {
             fprintf(stderr, "Erreur de lecture du fichier\n");
             fichierFermer(fichier); // ferme le fichier car le numero de la ville n'a pas ete trouve
             exit(EXIT_FAILURE);
         }
 
-        if (strstr(ligne, ville) != NULL) {
+        if (strstr(c, ville) != NULL) {
             fichierFermer(fichier); // ferme le fichier car le numero de la ville a ete trouve
             return numero_de_ligne;
         }
@@ -268,24 +263,20 @@ bool villeExiste(Chaine ville) {
  * @note Fonction 10
  */
 double distanceVilles(Chaine ville1, Chaine ville2) {
-
     int numeroVille1;
     int numeroVille2;
     double distance;
-
-
     Fichier fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
 
-
+    // Chercher le numéro de la première ville
     numeroVille1 = chercherNumeroVille(ville1);
-
     if (!villeExiste(ville1)) {
         fprintf(stderr, "La Ville de %s n'a pas ete trouvee\n", ville1);
         fichierFermer(fichier);
         exit(EXIT_FAILURE);
     }
 
-
+    // Chercher le numéro de la deuxième ville
     numeroVille2 = chercherNumeroVille(ville2);
     if (!villeExiste(ville2)) {
         fprintf(stderr, "Ville '%s' non trouvee\n", ville2);
@@ -293,36 +284,34 @@ double distanceVilles(Chaine ville1, Chaine ville2) {
         exit(EXIT_FAILURE);
     }
 
-
+    // Avancer jusqu'à la ligne correspondant à la première ville
     if (!fichierAvancerLignes(fichier, numeroVille1)) {
         fprintf(stderr, "Erreur de deplacement a la ligne %d\n", numeroVille1);
         fichierFermer(fichier);
         exit(EXIT_FAILURE);
     }
 
-    if (numeroVille1 > 1 && numeroVille2 > 2) {
 
-        numeroVille2 -= 1;
-    }
-
+    // Avancer jusqu'au champ correspondant à la deuxième ville
     if (!fichierAvancerChamps(fichier, numeroVille2)) {
         fprintf(stderr, "Erreur de deplacement a la colonne %d\n", numeroVille2);
         fichierFermer(fichier);
         exit(EXIT_FAILURE);
     }
 
-
-
+    // Lire la distance
     if (!fichierLireReel(fichier)) {
         fprintf(stderr, "Erreur de lecture de la distance\n");
         fichierFermer(fichier);
         exit(EXIT_FAILURE);
     }
+   
     distance = fichierLireReel(fichier);
-    // Ferme le fichier
+
+    // Fermer le fichier
     fichierFermer(fichier);
 
-    // Retourne la distance entre les deux villes
+    // Retourner la distance entre les deux villes
     return distance;
 }
 
@@ -508,6 +497,8 @@ bool fichierAjouterEtape(Fichier fichier, Etape etape) {
         fprintf(stderr, "Erreur : fichier manquant\n");
         return false;
     }
+
+    return true;
 }
 
 /**
@@ -541,6 +532,7 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
     fichierLireChaine(fichier_voyage, depart);
     fichierLireChaine(fichier_voyage, arrivee);
 
+
         while (!finDeFichier(fichier_voyage)) {
 
             
@@ -552,7 +544,7 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
                 return false;
             }
 
-          
+      
             if (!fichierAjouterEtape(fichier_etapes, etape)) {
                 fprintf(stderr, "Erreur : ajout de l'etape entre %s et %s\n", depart, arrivee);
                 fichierFermer(fichier_voyage);
@@ -570,6 +562,22 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
                 return false;
             }
 
+        }
+
+        if (!preparerEtape(depart, arrivee, etape)) {
+            fprintf(stderr, "Erreur : preparation de l'etape entre %s et %s\n", depart, arrivee);
+            fichierFermer(fichier_voyage);
+            fichierFermer(fichier_etapes);
+
+            return false;
+        }
+
+
+        if (!fichierAjouterEtape(fichier_etapes, etape)) {
+            fprintf(stderr, "Erreur : ajout de l'etape entre %s et %s\n", depart, arrivee);
+            fichierFermer(fichier_voyage);
+            fichierFermer(fichier_etapes);
+            return false;
         }
 
     
@@ -667,6 +675,9 @@ void test_afficherDuree() {
 
     duree = 1.1;
     afficherDuree(duree);
+
+    duree = 1.33;
+    afficherDuree(duree);
    
     
 }
@@ -729,7 +740,7 @@ void test_fichierAvancerChamps() {
 
     fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
 
-    fichierAvancerChamps(fichier, 4);
+    fichierAvancerChamps(fichier, 2);
 
     resultat = fichierLireReel(fichier);
     printf("La valeur dans ce champs est: %.2lf\n", resultat);
@@ -783,40 +794,39 @@ void test_villeExiste() {
 void test_distanceVilles() {
 
     double distance;
-
-    Chaine ville1 = "Vancouver";
-    Chaine ville2 = "Thorold";
-
+    Chaine ville1= "Montreal";
+    Chaine ville2 = "Calgary";
+    
+  
     distance = distanceVilles(ville1, ville2);
-
-    printf("La distance entre les deux villes est: %.2lf\n", distance);
+    
+    printf("La distance entre les deux villes est:%.2lf\n",  distance);
 
 }
 
 void test_afficherEtape() {
 
-    Etape etape1 = { 0 };
-    Etape etape2 = { 0 };
-    Etape etape3 = { 0 };
+    Etape etape = { 0 };
     
-    etape1[ETAPE_VILLE_DEPART] = 1;
-    etape1[ETAPE_VILLE_ARRIVEE] = 20;
+    etape[ETAPE_VILLE_DEPART] = 1;
+    etape[ETAPE_VILLE_ARRIVEE] = 20;
 
-    etape2[ETAPE_VILLE_DEPART] = 1;
-    etape2[ETAPE_VILLE_ARRIVEE] = 49;
+    Chaine depart;
+    Chaine arrivee;
 
-    etape3[ETAPE_VILLE_DEPART] = 1;
-    etape3[ETAPE_VILLE_ARRIVEE] = 32;
+    chercherVille((int)etape[ETAPE_VILLE_DEPART], depart);
+    chercherVille((int)etape[ETAPE_VILLE_ARRIVEE], arrivee);
 
 
-    printf("Exemple 1 d'etape:\n");
-    afficherEtape(etape1);
+    if (!preparerEtape(depart, arrivee, etape)) {
 
-    printf("\nExemple 2 d'etape:\n");
-    afficherEtape(etape2);
+        printf("L'une des villes n'est pas dans le fichier des distances.\n");
+    }
+    else {
 
-    printf("\nExemple 3 d'etape:\n");
-    afficherEtape(etape3);
+        printf("Exemple 1 d'etape:\n");
+        afficherEtape(etape);
+    }
 }
 
 void test_preparerEtape() {
@@ -918,17 +928,12 @@ int main() {
     printf("------------------------------------------------------------------------------------------------------\n");
     test_villeExiste();
     printf("------------------------------------------------------------------------------------------------------\n");
-
     test_distanceVilles();
-
     printf("------------------------------------------------------------------------------------------------------\n");
     test_afficherEtape();
     printf("------------------------------------------------------------------------------------------------------\n");
-
     test_preparerEtape();
     printf("------------------------------------------------------------------------------------------------------\n");
-
-
     test_fichierAjouterEtape();
     printf("------------------------------------------------------------------------------------------------------\n");
     test_creerFichierEtapes();
@@ -938,4 +943,3 @@ int main() {
     test_creerStatistiques();
     return 0;
 }
-
