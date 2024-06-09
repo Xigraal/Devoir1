@@ -2,7 +2,6 @@
 // Created by stephane on 04/05/24.
 //
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +11,7 @@
 #include "structures.h"
 #include "constantes.h"
 
+// commentaires faites par chatgpt
 
 // derclaration des fonctions
 void calcul_duree(double duree, int* part_entiere, int* minutes);
@@ -26,22 +26,23 @@ void calcul_duree(double duree, int* part_entiere, int* minutes);
  * @note Fonction 1
  */
 void afficherDuree(double duree) {
+    int part_entiere;
+    int minutes;
 
-    int part_entiere; // variable qui contient la valeur en heure
-    int minutes; // variable qui contient les valeurs decimales en minutes
-
+    // Calculer la durée en heures et minutes
     calcul_duree(duree, &part_entiere, &minutes);
-    if (minutes < 10) {
 
+    // Afficher la durée au format approprié
+    if (minutes < 10) {
         printf(" %dh0%d'\n", part_entiere, minutes);
     }
     else {
-
         printf(" %dh%d'\n", part_entiere, minutes);
     }
 }
+
 /**
- * @brief Calcul  une duree donnees en decimales, en heures et minutes
+ * @brief Calcul une duree donnees en decimales, en heures et minutes
  * @param duree : le temps en heures a calculer
  * @param minutes : les minutes passes par references
  * @param part_entiere : L'heure passee par references
@@ -49,15 +50,14 @@ void afficherDuree(double duree) {
  * @note Fonction 1.1
  */
 void calcul_duree(double duree, int* part_entiere, int* minutes) {
+    double part_decimale;
 
-    double part_decimale; //variable qui contient la valeur des minutes et secondes en decimale
+    *part_entiere = duree;  // Extraire la partie entière
+    part_decimale = duree - *part_entiere;  // Calculer la partie décimale
 
-    *part_entiere = duree; // recupperation de la valeur en heure
-    part_decimale = duree - *part_entiere; //recupperation de la valeur des minutes
-    *minutes = (part_decimale * MINUTES_DANS_UNE_HEURE) + FACTEUR_DE_CORRECTION; // convertir les valeurs decimales en minutes
+    // Convertir la partie décimale en minutes
+    *minutes = (part_decimale * MINUTES_DANS_UNE_HEURE) + FACTEUR_DE_CORRECTION; 
 }
-
-
 
 /**
  * @brief Teste si 2 villes sont egales
@@ -67,7 +67,7 @@ void calcul_duree(double duree, int* part_entiere, int* minutes) {
  * @note Fonction 2
  */
 bool villesEgales(Chaine ville1, Chaine ville2) {
-
+    // Comparer les deux chaînes de caractères pour vérifier l'égalité des villes
     return chainesEgales(ville1, ville2);
 }
 
@@ -84,16 +84,16 @@ bool villesEgales(Chaine ville1, Chaine ville2) {
 int fichierLireEntier(Fichier fichier) {
     Chaine chaine;
 
-    // Vérifie si la fin de fichier est atteinte
+    // Vérifier si la fin du fichier a été atteinte
     if (finDeFichier(fichier)) {
         fprintf(stderr, "Erreur: la fin de fichier a été atteinte\n");
         exit(EXIT_FAILURE);
     }
 
-    // Lit la prochaine chaîne dans le fichier
+    // Lire la chaîne de caractères suivante
     bool valide = fichierLireChaine(fichier, chaine);
 
-    // Si la lecture est valide, convertir la chaîne en entier
+    // Convertir la chaîne en entier et la retourner
     if (valide) {
         return atoi(chaine);
     }
@@ -111,18 +111,19 @@ int fichierLireEntier(Fichier fichier) {
  * @note Fonction 4
  */
 double fichierLireReel(Fichier fichier) {
+    Chaine chaine;
 
-	Chaine chaine;
+    // Lire la chaîne de caractères suivante
+    bool valide = fichierLireChaine(fichier, chaine);
 
-	bool valide = fichierLireChaine(fichier, chaine);
-
-	if (valide) {
-		return atof(chaine);
-	}
-	else {
-		printf("Erreur de lecture du fichier");
-		exit(EXIT_FAILURE);
-	}
+    // Convertir la chaîne en réel et la retourner
+    if (valide) {
+        return atof(chaine);
+    }
+    else {
+        printf("Erreur de lecture du fichier");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
@@ -133,13 +134,15 @@ double fichierLireReel(Fichier fichier) {
  * @note Fonction 5
  */
 bool fichierAvancerChamps(Fichier fichier, int n) {
-
     int i = 0;
     Chaine chaine;
 
+    // Avancer de n champs dans le fichier
     while (i < n && fichierLireChaine(fichier, chaine)) {
         i++;
     }
+
+    // Vérifier si le nombre de champs avancé est égal à n
     if (i == n) {
         return true;
     }
@@ -156,11 +159,10 @@ bool fichierAvancerChamps(Fichier fichier, int n) {
  * @note Fonction 6
  */
 bool fichierAvancerLignes(Fichier fichier, int n) {
-
+    // Avancer de n lignes dans le fichier
     for (int i = 1; i < n; i++) {
-
         if (!fichierLigneSuivante(fichier)) {
-            return false; // Echec de l'avancement des lignes, car la fin de fichier a ete atteinte
+            return false;
         }
     }
 
@@ -177,35 +179,37 @@ bool fichierAvancerLignes(Fichier fichier, int n) {
  * @note Fonction 7
  */
 int chercherNumeroVille(Chaine ville) {
-    
     int numero_de_ligne = 0;
     Fichier fichier;
     Chaine c;
 
     fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
-    while (!finDeFichier(fichier)) {
 
-        numero_de_ligne+=1;
+    // Parcourir le fichier pour trouver la ville
+    while (!finDeFichier(fichier)) {
+        numero_de_ligne += 1;
 
         if (!fichierLireChaine(fichier, c)) {
             fprintf(stderr, "Erreur de lecture du fichier\n");
-            fichierFermer(fichier); // ferme le fichier car le numero de la ville n'a pas ete trouve
+            fichierFermer(fichier);
             exit(EXIT_FAILURE);
         }
 
+        // Vérifier si la ville est trouvée dans la chaîne actuelle
         if (strstr(c, ville) != NULL) {
-            fichierFermer(fichier); // ferme le fichier car le numero de la ville a ete trouve
+            fichierFermer(fichier);
             return numero_de_ligne;
         }
+
+        // Passer à la ligne suivante du fichier
         if (!fichierLigneSuivante(fichier)) {
-            break; // Arrêter la recherche si la fin du fichier est atteinte
+            break;
         }
     }
 
     fichierFermer(fichier);
-    return -1; // La ville n'a pas été trouvée
-
-    }
+    return -1;
+}
 
 /**
  * @brief Cherche une ville dans la liste des villes a partir de son numero
@@ -215,32 +219,25 @@ int chercherNumeroVille(Chaine ville) {
  * @note Fonction 8
  */
 bool chercherVille(int numeroVille, Chaine ville) {
-
     Fichier fichier;
 
-    // Ouvre le fichier
-     fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
+    // Ouvrir le fichier de distances en lecture
+    fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
 
-    // Avance les lignes du fichier
+    // Avancer jusqu'à la ligne correspondant au numéro de ville
     if (fichierAvancerLignes(fichier, numeroVille)) {
-
-        // Lit la chaîne
+        // Lire la chaîne de caractères de la ville trouvée
         fichierLireChaine(fichier, ville);
 
-        // Ferme le fichier
+        // Fermer le fichier
         fichierFermer(fichier);
 
-        // Retourne true
         return true;
     }
     else {
-        // Ferme le fichier
         fichierFermer(fichier);
-
-        // Retourne false
         return false;
     }
-
 }
 
 /**
@@ -250,7 +247,7 @@ bool chercherVille(int numeroVille, Chaine ville) {
  * @note Fonction 9
  */
 bool villeExiste(Chaine ville) {
-
+    // Chercher le numéro de la ville, retourne vrai si trouvé
     return chercherNumeroVille(ville) != VILLE_NON_TROUVEE;
 }
 
@@ -266,9 +263,10 @@ double distanceVilles(Chaine ville1, Chaine ville2) {
     int numeroVille1;
     int numeroVille2;
     double distance;
+
     Fichier fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
 
-    // Chercher le numéro de la première ville
+    // Vérifier si la première ville existe
     numeroVille1 = chercherNumeroVille(ville1);
     if (!villeExiste(ville1)) {
         fprintf(stderr, "La Ville de %s n'a pas ete trouvee\n", ville1);
@@ -276,7 +274,7 @@ double distanceVilles(Chaine ville1, Chaine ville2) {
         exit(EXIT_FAILURE);
     }
 
-    // Chercher le numéro de la deuxième ville
+    // Vérifier si la seconde ville existe
     numeroVille2 = chercherNumeroVille(ville2);
     if (!villeExiste(ville2)) {
         fprintf(stderr, "Ville '%s' non trouvee\n", ville2);
@@ -291,32 +289,29 @@ double distanceVilles(Chaine ville1, Chaine ville2) {
         exit(EXIT_FAILURE);
     }
 
-
-    // Avancer jusqu'au champ correspondant à la deuxième ville
+    // Avancer jusqu'à la colonne correspondant à la seconde ville
     if (!fichierAvancerChamps(fichier, numeroVille2)) {
         fprintf(stderr, "Erreur de deplacement a la colonne %d\n", numeroVille2);
         fichierFermer(fichier);
         exit(EXIT_FAILURE);
     }
 
-    // Lire la distance
+    // Lire la distance entre les deux villes
     if (!fichierLireReel(fichier)) {
         fprintf(stderr, "Erreur de lecture de la distance\n");
         fichierFermer(fichier);
         exit(EXIT_FAILURE);
     }
-   
+
     distance = fichierLireReel(fichier);
 
-    // Fermer le fichier
     fichierFermer(fichier);
 
-    // Retourner la distance entre les deux villes
     return distance;
 }
 
 //  Fonctions 11 a 14 : manipulation des etapes
-//  -------------------------------------------
+//  ------------------------------------------
 
 /**
  * @brief Affiche une etape (passee en parametre).
@@ -338,32 +333,28 @@ double distanceVilles(Chaine ville1, Chaine ville2) {
  * @note Fonction 11
  */
 void afficherEtape(Etape etape) {
-
     Chaine ville1;
     Chaine ville2;
 
-
+    // Chercher les noms des villes de départ et d'arrivée
     chercherVille((int)etape[ETAPE_VILLE_DEPART], ville1);
     chercherVille((int)etape[ETAPE_VILLE_ARRIVEE], ville2);
 
+    // Afficher les informations de l'étape
     printf("Ville de depart : %s\n", ville1);
     printf("Ville d'arrivee : %s\n", ville2);
 
+    // Afficher les détails de l'étape selon le type de locomotion
     if (etape[ETAPE_DISTANCE] <= DISTANCE_MAX_ROUTE) {
-
         printf("Distance : %.2lf Km\n", etape[ETAPE_DISTANCE]);
         printf("Locomotion : par route\n");
-       
         printf("Nombre de pauses : %d\n", (int)etape[ETAPE_PAUSES]);
         printf("Duree : ");
         afficherDuree(etape[ETAPE_DUREE]);
     }
-
     else {
-
         printf("Distance : %.2lf Km\n", etape[ETAPE_DISTANCE]);
         printf("Locomotion : par avion\n");
-        
         printf("Temps d'attente :");
         afficherDuree(etape[ETAPE_ATTENTE]);
         printf("Duree : ");
@@ -380,39 +371,31 @@ void afficherEtape(Etape etape) {
  * @note Fonction 12
  */
 bool preparerEtape(Chaine depart, Chaine arrivee, Etape etape) {
-
+    // Vérifier l'existence des villes
     if (villeExiste(depart) < 0 && villeExiste(arrivee) < 0) {
         return false;
     }
 
+    // Initialiser les informations de l'étape
     etape[ETAPE_VILLE_DEPART] = chercherNumeroVille(depart);
     etape[ETAPE_VILLE_ARRIVEE] = chercherNumeroVille(arrivee);
+    etape[ETAPE_DISTANCE] = distanceVilles(depart, arrivee);
+    etape[ETAPE_PAUSES] = etape[ETAPE_DISTANCE] / PAUSE_VOITURE;
 
- 
-
-     etape[ETAPE_DISTANCE] = distanceVilles(depart, arrivee);
-
-     etape[ETAPE_PAUSES] = etape[ETAPE_DISTANCE] / PAUSE_VOITURE;
-
-
+    // Définir le temps d'attente selon la distance
     if (etape[ETAPE_DISTANCE] < LIMITE_ATTENTE_AVION) {
-
         etape[ETAPE_ATTENTE] = ATTENTE_AVION_MIN;
     }
     else {
-
         etape[ETAPE_ATTENTE] = ATTENTE_AVION_MAX;
     }
 
+    // Calculer la durée de l'étape selon le mode de locomotion
     if (etape[ETAPE_DISTANCE] <= DISTANCE_MAX_ROUTE) {
-
         etape[ETAPE_LOCOMOTION] = LOCOMOTION_PAR_ROUTE;
         etape[ETAPE_DUREE] = (etape[ETAPE_DISTANCE] / VITESSE_PAR_ROUTE) + etape[ETAPE_PAUSES] * DUREE_PAUSE;
-
     }
-
     else {
-
         etape[ETAPE_LOCOMOTION] = LOCOMOTION_PAR_AIR;
         etape[ETAPE_DUREE] = (etape[ETAPE_DISTANCE] / VITESSE_PAR_AIR) + etape[ETAPE_ATTENTE];
     }
@@ -429,70 +412,62 @@ bool preparerEtape(Chaine depart, Chaine arrivee, Etape etape) {
  * @todo Gerer les erreur possibles !
  */
 bool fichierAjouterEtape(Fichier fichier, Etape etape) {
-
     Chaine ville1;
     Chaine ville2;
-    double distance = 0.0;
-    int pauses = 0;
-    double duree = 0.0;
+    int part_entiere;
+    int minutes;
 
-
+    // Chercher les noms des villes de départ et d'arrivée
     chercherVille((int)etape[ETAPE_VILLE_DEPART], ville1);
     chercherVille((int)etape[ETAPE_VILLE_ARRIVEE], ville2);
 
-    if (fprintf(fichier, "Ville de depart : %s\n",ville1) < 0) return false;
+    // Ajouter les informations de l'étape dans le fichier
+    if (fprintf(fichier, "Ville de depart : %s\n", ville1) < 0) return false;
     if (fprintf(fichier, "Ville d'arrivee : %s\n", ville2) < 0) return false;
 
-    distance = etape[ETAPE_DISTANCE] = distanceVilles(ville1, ville2);
+    // Calculer la distance et les pauses
+    etape[ETAPE_DISTANCE] = distanceVilles(ville1, ville2);
+    etape[ETAPE_PAUSES] = etape[ETAPE_DISTANCE] / PAUSE_VOITURE;
 
-
-    
-    pauses = etape[ETAPE_PAUSES] = distance / PAUSE_VOITURE;
-
-
-    if (distance < LIMITE_ATTENTE_AVION) {
-
+    // Définir le temps d'attente selon la distance
+    if (etape[ETAPE_DISTANCE] < LIMITE_ATTENTE_AVION) {
         etape[ETAPE_ATTENTE] = ATTENTE_AVION_MIN;
     }
     else {
-
         etape[ETAPE_ATTENTE] = ATTENTE_AVION_MAX;
     }
 
-    if (distance <= DISTANCE_MAX_ROUTE) {
-
+    // Ajouter les détails de l'étape selon le mode de locomotion
+    if (etape[ETAPE_DISTANCE] <= DISTANCE_MAX_ROUTE) {
+        // Si distance <= DISTANCE_MAX_ROUTE, locomotion par route
         etape[ETAPE_LOCOMOTION] = LOCOMOTION_PAR_ROUTE;
-        duree = etape[ETAPE_DUREE] = (distance / VITESSE_PAR_ROUTE) + pauses * DUREE_PAUSE;
+        etape[ETAPE_DUREE] = (etape[ETAPE_DISTANCE] / VITESSE_PAR_ROUTE) + etape[ETAPE_PAUSES] * DUREE_PAUSE;
 
-        int part_entiere; // variable qui contient la valeur en heure
-        int minutes; // variable qui contient les valeurs decimales en minutes
-        calcul_duree(duree, &part_entiere, &minutes);
+        
+        calcul_duree(etape[ETAPE_DUREE], &part_entiere, &minutes);
 
-        if (fprintf(fichier, "Distance : %.2lf Km\n", distance) < 0) return false;
+        // Écriture des informations de l'étape dans le fichier
+        if (fprintf(fichier, "Distance : %.2lf Km\n", etape[ETAPE_DISTANCE]) < 0) return false;
         if (fprintf(fichier, "Locomotion : par route\n") < 0) return false;
-
-        if (fprintf(fichier, "Nombre de pauses : %d\n",pauses) < 0) return false;
+        if (fprintf(fichier, "Nombre de pauses : %d\n", etape[ETAPE_PAUSES]) < 0) return false;
         if (fprintf(fichier, "Duree : %dh%d'\n", part_entiere, minutes) < 0) return false;
     }
-
-
     else {
-
+        // Sinon, locomotion par avion
         etape[ETAPE_LOCOMOTION] = LOCOMOTION_PAR_AIR;
-        duree = etape[ETAPE_DUREE] = (distance / VITESSE_PAR_AIR) + etape[ETAPE_ATTENTE];
+        etape[ETAPE_DUREE] = (etape[ETAPE_DISTANCE] / VITESSE_PAR_AIR) + etape[ETAPE_ATTENTE];
 
+        
+        calcul_duree(etape[ETAPE_DUREE], &part_entiere, &minutes);
 
-        int part_entiere; // variable qui contient la valeur en heure
-        int minutes; // variable qui contient les valeurs decimales en minutes
-        calcul_duree(duree, &part_entiere, &minutes);
-
-        if (fprintf(fichier, "Distance : %.2lf Km\n", distance) < 0) return false;
+        // Écriture des informations de l'étape dans le fichier
+        if (fprintf(fichier, "Distance : %.2lf Km\n", etape[ETAPE_DISTANCE]) < 0) return false;
         if (fprintf(fichier, "Locomotion : par avion\n") < 0) return false;
-
         if (fprintf(fichier, "Temps d'attente : %.2lf\n", etape[ETAPE_ATTENTE]) < 0) return false;
         if (fprintf(fichier, "Duree : %dh%d'\n", part_entiere, minutes) < 0) return false;
     }
 
+    // Vérifier si le fichier est null
     if (fichier == NULL) {
         fprintf(stderr, "Erreur : fichier manquant\n");
         return false;
@@ -510,15 +485,14 @@ bool fichierAjouterEtape(Fichier fichier, Etape etape) {
  * @todo Gerer les erreur possibles !
  */
 bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
-
-    
+    // Ouvrir le fichier des villes en lecture
     Fichier fichier_voyage = fichierOuvrirLecture(nom_fichier_voyage);
     if (fichier_voyage == NULL) {
         fprintf(stderr, "Erreur : impossible d'ouvrir le fichier des villes %s\n", nom_fichier_voyage);
         return false;
     }
 
-   
+    // Ouvrir le fichier des étapes en écriture
     Fichier fichier_etapes = fichierOuvrirEcriture(nom_fichier_etapes);
     if (fichier_etapes == NULL) {
         fprintf(stderr, "Erreur : impossible d'ouvrir le fichier des etapes %s\n", nom_fichier_etapes);
@@ -529,49 +503,18 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
     Etape etape;
     Chaine depart, arrivee;
 
+    // Lire les villes de depart et arrivee
     fichierLireChaine(fichier_voyage, depart);
     fichierLireChaine(fichier_voyage, arrivee);
 
-
-        while (!finDeFichier(fichier_voyage)) {
-
-            
-            if (!preparerEtape(depart, arrivee, etape)) {
-                fprintf(stderr, "Erreur : preparation de l'etape entre %s et %s\n", depart, arrivee);
-                fichierFermer(fichier_voyage);
-                fichierFermer(fichier_etapes);
-                
-                return false;
-            }
-
-      
-            if (!fichierAjouterEtape(fichier_etapes, etape)) {
-                fprintf(stderr, "Erreur : ajout de l'etape entre %s et %s\n", depart, arrivee);
-                fichierFermer(fichier_voyage);
-                fichierFermer(fichier_etapes);
-                return false;
-            }
-
-            chainesCopier(arrivee, depart);
-
-
-            if (!fichierLireChaine(fichier_voyage, arrivee)) {
-                fprintf(stderr, "Erreur : impossible de lire la prochaine ville dans %s\n", nom_fichier_voyage);
-                fichierFermer(fichier_voyage);
-                fichierFermer(fichier_etapes);
-                return false;
-            }
-
-        }
-
+    // Lire les villes du fichier et préparer les étapes
+    while (!finDeFichier(fichier_voyage)) {
         if (!preparerEtape(depart, arrivee, etape)) {
             fprintf(stderr, "Erreur : preparation de l'etape entre %s et %s\n", depart, arrivee);
             fichierFermer(fichier_voyage);
             fichierFermer(fichier_etapes);
-
             return false;
         }
-
 
         if (!fichierAjouterEtape(fichier_etapes, etape)) {
             fprintf(stderr, "Erreur : ajout de l'etape entre %s et %s\n", depart, arrivee);
@@ -580,7 +523,35 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
             return false;
         }
 
+        // Copier la ville d'arrivée comme nouvelle ville de départ
+        chainesCopier(arrivee, depart);
+
+        // Lire la prochaine ville
+        if (!fichierLireChaine(fichier_voyage, arrivee)) {
+            fprintf(stderr, "Erreur : impossible de lire la prochaine ville dans %s\n", nom_fichier_voyage);
+            fichierFermer(fichier_voyage);
+            fichierFermer(fichier_etapes);
+            return false;
+        }
+    }
+
+    // Préparer et ajouter la dernière étape
+    if (!preparerEtape(depart, arrivee, etape)) {
+        fprintf(stderr, "Erreur : preparation de l'etape entre %s et %s\n", depart, arrivee);
+        fichierFermer(fichier_voyage);
+        fichierFermer(fichier_etapes);
+        return false;
+    }
+
     
+    if (!fichierAjouterEtape(fichier_etapes, etape)) {
+        fprintf(stderr, "Erreur : ajout de l'etape entre %s et %s\n", depart, arrivee);
+        fichierFermer(fichier_voyage);
+        fichierFermer(fichier_etapes);
+        return false;
+    }
+
+    // Fermer les fichiers
     fichierFermer(fichier_voyage);
     fichierFermer(fichier_etapes);
 
@@ -600,14 +571,11 @@ bool creerFichierEtapes(Chaine nom_fichier_voyage, Chaine nom_fichier_etapes) {
  * @note Fonction 15
  */
 void afficherStatistiques(Statistiques stats) {
-
     printf("Nombre d'etapes par route : %.0f\n", stats[STATS_NB_ETAPES_PAR_ROUTE]);
     printf("Nombre d'etapes par air : %.0f\n", stats[STATS_NB_ETAPES_PAR_AIR]);
     printf("Nombre de pauses : %.0f\n", stats[STATS_NB_PAUSES]);
     printf("Temps d'attente : ");
     afficherDuree(stats[STATS_TEMPS_ATTENTE]);
-
-
 }
 
 /**
@@ -618,7 +586,7 @@ void afficherStatistiques(Statistiques stats) {
  * @note Fonction 16
  */
 bool creerStatistiques(Chaine nomFichierEtapes, Statistiques stats) {
-
+    // Ouvrir le fichier des étapes en lecture
     Fichier fichier_etapes = fichierOuvrirLecture(nomFichierEtapes);
 
     if (fichier_etapes == NULL) {
@@ -628,38 +596,40 @@ bool creerStatistiques(Chaine nomFichierEtapes, Statistiques stats) {
 
     Chaine chaine;
 
+    // Initialiser les statistiques
     stats[STATS_NB_ETAPES_PAR_ROUTE] = 0.0;
     stats[STATS_NB_ETAPES_PAR_AIR] = 0.0;
     stats[STATS_NB_PAUSES] = 0.0;
     stats[STATS_TEMPS_ATTENTE] = 0.0;
 
+    // Lire les étapes du fichier et calculer les statistiques
     while (fichierLireChaine(fichier_etapes, chaine)) {
         if (chainesEgales("route", chaine)) {
+            // Si l'étape est par route, incrémenter le compteur
+            stats[STATS_NB_ETAPES_PAR_ROUTE]++;
 
-            stats[STATS_NB_ETAPES_PAR_ROUTE] ++;
-
+            // Avancer d'une ligne et quatre champs pour lire le nombre de pauses
             if (fichierAvancerLignes(fichier_etapes, 1) && fichierAvancerChamps(fichier_etapes, 4)) {
                 fichierLireChaine(fichier_etapes, chaine);
-
                 stats[STATS_NB_PAUSES] += atof(chaine);
-
             }
-
         }
         else if (chainesEgales("avion", chaine)) {
+            // Si l'étape est par avion, incrémenter le compteur
+            stats[STATS_NB_ETAPES_PAR_AIR]++;
 
-            stats[STATS_NB_ETAPES_PAR_AIR] ++;
-
+            // Lire et ignorer le temps de vol
             fichierLireReel(fichier_etapes);
 
+            // Avancer d'une ligne et deux champs pour lire le temps d'attente
             if (fichierAvancerLignes(fichier_etapes, 1) && fichierAvancerChamps(fichier_etapes, 2)) {
                 fichierLireChaine(fichier_etapes, chaine);
-
                 stats[STATS_TEMPS_ATTENTE] += atof(chaine);
             }
         }
     }
 
+    // Fermer le fichier des étapes
     fichierFermer(fichier_etapes);
     return true;
 }
@@ -678,19 +648,15 @@ void test_afficherDuree() {
 
     duree = 1.33;
     afficherDuree(duree);
-   
-    
 }
 
 void test_villesEgales() {
-   
     Chaine ville1 = "Montreal";
     Chaine ville2 = "Toronto";
 
     villesEgales(ville1, ville2);
 
     if (villesEgales(ville1, ville2) == true) {
-
         printf(" Les deux villes sont pareils\n");
     }
     else {
@@ -699,7 +665,6 @@ void test_villesEgales() {
 }
 
 void test_fichierLireEntier() {
-
     Fichier fichier;
     int resultat;
 
@@ -715,26 +680,23 @@ void test_fichierLireEntier() {
     }
 }
 
-
 void test_fichierLireReel() {
+    Fichier fichier;
+    double resultat;
 
-	Fichier fichier;
-	double resultat;
+    fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
 
-	fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
+    Chaine c;
+    fichierLireChaine(fichier, c);
+    printf("%s\n", c);
 
-	Chaine c;
-	fichierLireChaine(fichier, c);
-	printf("%s\n", c);
-
-	for (int i = 0; i < 4; i++) {
-		resultat = fichierLireReel(fichier);
-		printf("%.2lf\n", resultat);
-	}
+    for (int i = 0; i < 4; i++) {
+        resultat = fichierLireReel(fichier);
+        printf("%.2lf\n", resultat);
+    }
 }
 
 void test_fichierAvancerChamps() {
-
     Fichier fichier;
     double resultat;
 
@@ -747,7 +709,6 @@ void test_fichierAvancerChamps() {
 }
 
 void test_fichierAvancerLignes() {
-
     Fichier fichier;
 
     fichier = fichierOuvrirLecture(FICHIER_DES_DISTANCES);
@@ -761,26 +722,22 @@ void test_fichierAvancerLignes() {
 }
 
 void test_chercherNumeroVille() {
-
     Chaine ville = "MedicineHat";
     int resultat;
 
     resultat = chercherNumeroVille(ville);
     printf("Le numero de la ville est: %d\n", resultat);
-
-
 }
 
 void test_fichierChercherVille() {
-    
     int numero_ville = 45;
     Chaine ville;
+
     chercherVille(numero_ville, ville);
     printf("La ville rechercher est: %s\n", ville);
 }
 
 void test_villeExiste() {
-    
     Chaine ville = "Montreal";
 
     if (!villeExiste(ville)) {
@@ -792,22 +749,17 @@ void test_villeExiste() {
 }
 
 void test_distanceVilles() {
-
     double distance;
-    Chaine ville1= "Montreal";
+    Chaine ville1 = "Montreal";
     Chaine ville2 = "Calgary";
-    
-  
-    distance = distanceVilles(ville1, ville2);
-    
-    printf("La distance entre les deux villes est:%.2lf\n",  distance);
 
+    distance = distanceVilles(ville1, ville2);
+    printf("La distance entre les deux villes est: %.2lf\n", distance);
 }
 
 void test_afficherEtape() {
-
     Etape etape = { 0 };
-    
+
     etape[ETAPE_VILLE_DEPART] = 1;
     etape[ETAPE_VILLE_ARRIVEE] = 20;
 
@@ -817,61 +769,49 @@ void test_afficherEtape() {
     chercherVille((int)etape[ETAPE_VILLE_DEPART], depart);
     chercherVille((int)etape[ETAPE_VILLE_ARRIVEE], arrivee);
 
-
     if (!preparerEtape(depart, arrivee, etape)) {
-
         printf("L'une des villes n'est pas dans le fichier des distances.\n");
     }
     else {
-
         printf("Exemple 1 d'etape:\n");
         afficherEtape(etape);
     }
 }
 
 void test_preparerEtape() {
-
     Chaine depart = "Montreal";
     Chaine arrivee = "Quebec";
     Etape etape;
 
     if (!preparerEtape(depart, arrivee, etape)) {
-       
         printf("L'une des villes n'est pas dans le fichier des distances.\n");
     }
     else {
         afficherEtape(etape);
     }
-
 }
 
 void test_fichierAjouterEtape() {
+    Etape etape = { 1, 20 };
 
-    
-    Etape etape = { 1, 20};
-
-   
     FILE* fichier = fichierOuvrirEcriture(FICHIER_ETAPE);
     if (!fichier) {
         fprintf(stderr, "Erreur: impossible d'ouvrir le fichier en ecriture\n");
         return;
     }
 
-    
     if (!fichierAjouterEtape(fichier, etape)) {
         fprintf(stderr, "Erreur: impossible d'ajouter l'etape\n");
         fichierFermer(fichier);
         return;
     }
 
-   
     fichierFermer(fichier);
 
     printf("Test reussi: l'etape a ete ajoutee avec succes.\n");
 }
 
 void test_creerFichierEtapes() {
-
     Chaine nomFichierVoyage = FICHIER_VOYAGE;
     Chaine nomFichierEtapes = FICHIER_ETAPE;
 
@@ -884,31 +824,24 @@ void test_creerFichierEtapes() {
 }
 
 void test_afficherStatistiques() {
-
     Statistiques stats = { 1, 1, 2, 2.5 };
     printf("Les statistiques du test sont:\n");
     afficherStatistiques(stats);
 }
 
 void test_creerStatistiques() {
-
     Statistiques stats;
-    
 
     creerStatistiques(FICHIER_ETAPE, stats);
 
     printf("Les statistiques des etapes du fichier sont:\n");
     afficherStatistiques(stats);
-
 }
 
 // -------------------------------------------------------------------------------------------------------------------
 
 int main() {
-
-    
     srand(time(NULL));
-
 
     test_afficherDuree();
     printf("------------------------------------------------------------------------------------------------------\n");
